@@ -1,0 +1,77 @@
+-- LocalScript внутри StarterPlayerScripts или StarterGui
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Создание компактного интерфейса
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "VehicleTunerGui"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 120)
+frame.Position = UDim2.new(0.8, 0, 0.7, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 25)
+title.Text = "Настройки Авто"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+title.Parent = frame
+
+-- Поле ввода максимальной скорости
+local speedInput = Instance.new("TextBox")
+speedInput.Size = UDim2.new(0.9, 0, 0, 30)
+speedInput.Position = UDim2.new(0.05, 0, 0.3, 0)
+speedInput.PlaceholderText = "Макс. скорость (250)"
+speedInput.Text = ""
+speedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+speedInput.Parent = frame
+
+-- Поле ввода множителя ускорения
+local accelInput = Instance.new("TextBox")
+accelInput.Size = UDim2.new(0.9, 0, 0, 30)
+accelInput.Position = UDim2.new(0.05, 0, 0.65, 0)
+accelInput.PlaceholderText = "Ускорение (1.0 - 2.0)"
+accelInput.Text = ""
+accelInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+accelInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+accelInput.Parent = frame
+
+-- Применение параметров к текущему транспорту
+local maxSpeed = 250
+local accelMultiplier = 1.0
+
+speedInput.FocusLost:Connect(function()
+    local val = tonumber(speedInput.Text)
+    if val then maxSpeed = val end
+end)
+
+accelInput.FocusLost:Connect(function()
+    local val = tonumber(accelInput.Text)
+    if val then accelMultiplier = val end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+        local char = player.Character
+        if char and char:FindFirstChild("Humanoid") then
+            local seat = char.Humanoid.SeatPart
+            if seat and seat:IsA("VehicleSeat") then
+                seat.MaxSpeed = maxSpeed
+                if seat.ThrottleFloat > 0 then
+                    local primary = seat.Parent.PrimaryPart or seat
+                    primary.AssemblyLinearVelocity = primary.AssemblyLinearVelocity * (1 + (accelMultiplier - 1) * 0.1)
+                end
+            end
+        end
+    end
+end)
