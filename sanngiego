@@ -1,3 +1,5 @@
+
+
 local lp = game.Players.LocalPlayer
 
 task.spawn(function()
@@ -6,25 +8,28 @@ task.spawn(function()
             local char = lp.Character
             local hum = char and char:FindFirstChild("Humanoid")
             local seat = hum and hum.SeatPart
-            if seat and (seat:IsA("VehicleSeat") or seat:IsA("Seat")) then
+            if seat and seat:IsA("VehicleSeat") then
                 seat.MaxSpeed = 9999
                 seat.Torque = 99999
                 
                 local vehicle = seat.Parent
-                for _, v in ipairs(vehicle:GetDescendants()) do
-                    if v:IsA("NumberValue") or v:IsA("IntAttribute") or v:IsA("IntValue") then
-                        local name = v.Name:lower()
-                        if name:find("speed") or name:find("top") then 
-                            v.Value = 250 
-                        elseif name:find("hp") or name:find("power") or name:find("torque") or name:find("accel") then 
-                            v.Value = v.Value * 10 
+                local tune = vehicle:FindFirstChild("Tune") or vehicle:FindFirstChild("Config")
+                if tune then
+                    for _, v in ipairs(tune:GetDescendants()) do
+                        if v:IsA("NumberValue") or v:IsA("IntAttribute") or v:IsA("IntValue") then
+                            local name = v.Name:lower()
+                            if name:find("speed") or name:find("top") then 
+                                v.Value = 250 
+                            elseif name:find("hp") or name:find("power") or name:find("torque") or name:find("accel") then 
+                                v.Value = v.Value * 10 
+                            end
                         end
                     end
                 end
                 
                 local primary = vehicle.PrimaryPart or seat
                 if primary and seat.ThrottleFloat ~= 0 then
-                    primary.AssemblyLinearVelocity += primary.CFrame.LookVector * (seat.ThrottleFloat * 12)
+                    primary.AssemblyLinearVelocity += primary.CFrame.LookVector * (seat.ThrottleFloat * 15)
                 end
             end
         end)
