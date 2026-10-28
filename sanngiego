@@ -1,12 +1,12 @@
 local lp = game.Players.LocalPlayer
 
 task.spawn(function()
-    while task.wait(0.2) do
+    while task.wait(0.1) do
         pcall(function()
             local char = lp.Character
             local hum = char and char:FindFirstChild("Humanoid")
             local seat = hum and hum.SeatPart
-            if seat and seat:IsA("VehicleSeat") then
+            if seat and (seat:IsA("VehicleSeat") or seat:IsA("Seat")) then
                 seat.MaxSpeed = 9999
                 seat.Torque = 99999
                 
@@ -24,7 +24,7 @@ task.spawn(function()
                 
                 local primary = vehicle.PrimaryPart or seat
                 if primary and seat.ThrottleFloat ~= 0 then
-                    primary.AssemblyLinearVelocity += primary.CFrame.LookVector * (seat.ThrottleFloat * 8)
+                    primary.AssemblyLinearVelocity += primary.CFrame.LookVector * (seat.ThrottleFloat * 12)
                 end
             end
         end)
